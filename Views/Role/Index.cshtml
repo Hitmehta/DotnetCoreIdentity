@@ -1,0 +1,29 @@
+﻿<h1>Roles</h1>
+<div class="container mt-3">
+        <div class="d-flex align-items-center mb-3">
+            <label for="txtRoleName" class="form-label me-3" style="min-width: 100px;">Role Name:</label>
+            <input type="text" id="txtRoleName" class="form-control me-3" style="max-width: 300px;" />
+            <button type="submit" class="btn btn-primary" id="btnSubmit">Save</button>
+        </div>
+</div>
+<script>
+    $('#btnSubmit').on('click',function(){
+        var formData = new FormData();
+    formData.append("RoleName",$('#txtRoleName').val());
+    $.ajax({
+        url :'api/ApiRole/CreateRole',
+        type:'POST',
+        data:formData,
+        processData: false, // important!
+        contentType: false, // important!
+        success:function(result){
+
+        },
+        error:function(result){
+
+        }
+
+    });
+    });
+    
+</script>
