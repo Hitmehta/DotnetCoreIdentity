@@ -13,6 +13,20 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddRazorPages();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login"; // Redirect here when unauthorized
+
+    // Set cookie as session cookie (non-persistent)
+    
+
+    // Optional: set shorter expiry if you want
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = false;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

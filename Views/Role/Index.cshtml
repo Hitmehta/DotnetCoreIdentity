@@ -1,29 +1,74 @@
-﻿<h1>Roles</h1>
-<div class="container mt-3">
-        <div class="d-flex align-items-center mb-3">
-            <label for="txtRoleName" class="form-label me-3" style="min-width: 100px;">Role Name:</label>
-            <input type="text" id="txtRoleName" class="form-control me-3" style="max-width: 300px;" />
-            <button type="submit" class="btn btn-primary" id="btnSubmit">Save</button>
+﻿@{
+    var roles = ViewBag.RoleList as List<Microsoft.AspNetCore.Identity.IdentityRole>;
+    var menuLinks = ViewBag.MenuLinks as List<DotnetCoreIdentity.Models.MenuLinkTitles>;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left: Partial View Placeholder -->
+        <div class="col-md-5 border-end" id="roleFormContainer">
+            @Html.Partial("_CreateRolePartial", menuLinks)
         </div>
+
+        <!-- Right: Role List -->
+        <div class="col-md-7">
+            <h4>Role List</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Role Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var role in roles)
+                    {
+                        <tr>
+                            <td>@role.Name</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning btnEdit" data-roleid="@role.Id">Edit</button>
+                                <button class="btn btn-sm btn-danger btnDelete" data-roleid="@role.Id">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
 <script>
-    $('#btnSubmit').on('click',function(){
-        var formData = new FormData();
-    formData.append("RoleName",$('#txtRoleName').val());
-    $.ajax({
-        url :'api/ApiRole/CreateRole',
-        type:'POST',
-        data:formData,
-        processData: false, // important!
-        contentType: false, // important!
-        success:function(result){
+    // Load Edit Form
+    $(document).on('click', '.btnEdit', function () {
+        const roleId = $(this).data('roleid');
+        $.get('/Role/LoadEditForm', { roleId: roleId }, function (html) {
+            $('#roleFormContainer').html(html);
+        });
+    });
 
-        },
-        error:function(result){
+    // Delete Role
+    $(document).on('click', '.btnDelete', function () {
+        const roleId = $(this).data('roleid');
+        if (!confirm("Are you sure to delete this role?")) return;
 
+        $.ajax({
+            url: '/Role/DeleteRole',
+            type: 'POST',
+            data: { roleId: roleId },
+            success: function (res) {
+                alert(res.message);
+                location.reload();
+            },
+            error: function (jqXHR) {
+            let message = "Failed to delete.";
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                message = jqXHR.responseJSON.message;
+            } else if (jqXHR.responseText) {
+                message = jqXHR.responseText;
+            }
+            alert(message);
         }
 
+        });
     });
-    });
-    
 </script>

@@ -38,8 +38,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @await Component.InvokeAsync("Menu")
                     </ul>
                 </div>
+
+                <button id="btnClearCache" class="btn btn-warning">
+                    Refresh Session
+                </button>
                 <partial name="_LoginPartial"></partial>
             </div>
         </nav>
@@ -56,14 +61,28 @@
         </div>
     </footer>
 
-    
+
 
     <!-- DataTables JS CDN -->
-    
-
     <!-- Your site JS -->
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+             $(document).ready(function () {
+            $('#btnClearCache').on('click', function () {
+                $.ajax({
+                    url: '/Home/ClearCache',
+                    method: 'GET',
+                    success: function () {
+                        window.location.reload()
+                    },
+                    error: function () {
+                        alert("Error refreshing session.");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

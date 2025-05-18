@@ -1,0 +1,49 @@
+﻿<h1>Add Role</h1>
+
+<div class="container mt-3">
+    <div class="mb-3">
+        <label for="txtRoleName" class="form-label">Role Name:</label>
+        <input type="text" id="txtRoleName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Menu Links:</label>
+        <div class="form-check">
+            @foreach (var link in ViewBag.MenuLinks as List<DotnetCoreIdentity.Models.MenuLinkTitles>)
+            {
+                <div>
+                    <input type="checkbox" class="form-check-input menu-checkbox" value="@link.Id" id="link_@link.Id" />
+                    <label class="form-check-label" for="link_@link.Id">@link.MenuLinkTitle</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="btnSubmit">Save</button>
+</div>
+
+<script>
+    $('#btnSubmit').on('click', function () {
+        var formData = new FormData();
+        formData.append("roleName", $('#txtRoleName').val());
+
+        $('.menu-checkbox:checked').each(function () {
+            formData.append("menuLinkIds", $(this).val());
+        });
+
+        $.ajax({
+            url: '/api/ApiRole/CreateRoleWithRights',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                alert(result.message);
+                window.location.reload();
+            },
+            error: function () {
+                alert("Error while saving.");
+            }
+        });
+    });
+</script>

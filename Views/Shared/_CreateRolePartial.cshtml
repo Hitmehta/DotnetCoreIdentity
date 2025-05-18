@@ -1,0 +1,71 @@
+﻿@model List<DotnetCoreIdentity.Models.MenuLinkTitles>
+@{
+    var isEdit = ViewBag.IsEdit as bool? ?? false;
+    var roleId = ViewBag.RoleId as string;
+    var roleName = ViewBag.RoleName as string;
+    var selectedMenus = ViewBag.SelectedMenus as List<Guid> ?? new();
+}
+
+<h4>@(isEdit ? "Edit Role" : "Create Role")</h4>
+
+<input type="hidden" id="hiddenRoleId" value="@roleId" />
+
+<div class="mb-3">
+    <label for="txtRoleName" class="form-label">Role Name</label>
+    <input type="text" id="txtRoleName" class="form-control" value="@roleName" />
+</div>
+
+<h5>Menu Links</h5>
+@foreach (var link in Model)
+{
+    var isChecked = selectedMenus.Contains(link.Id) ? "checked" : "";
+    <div class="form-check">
+        <input class="form-check-input menu-checkbox" type="checkbox" value="@link.Id" id="menu_@link.Id" @isChecked>
+        <label class="form-check-label" for="menu_@link.Id">@link.MenuLinkTitle</label>
+    </div>
+}
+
+<button type="button" class="btn btn-primary mt-3" id="btnSubmit">@((isEdit) ? "Update" : "Save")</button>
+
+<script>
+    $('#btnSubmit').off('click').on('click', function () {
+        const formData = new FormData();
+        const isEdit = $('#hiddenRoleId').val() !== "";
+
+        formData.append("RoleId", $('#hiddenRoleId').val());
+        formData.append("RoleName", $('#txtRoleName').val());
+
+        $('.menu-checkbox:checked').each(function () {
+            formData.append("menuLinkIds", $(this).val());
+        });
+
+        $.ajax({
+            url: isEdit ? '/api/ApiRole/UpdateRoleWithRights' : '/api/ApiRole/CreateRoleWithRights',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                alert(res.message);
+                location.reload();
+            },
+                error: function (jqXHR) {
+                    debugger;
+        let message = "Failed to submit.";
+
+        try {
+            const response = JSON.parse(jqXHR.responseText);
+            if (response.message) {
+                message = response.message;
+            }
+        } catch (e) {
+            if (jqXHR.responseText) {
+                message = jqXHR.responseText;
+            }
+        }
+
+        alert(message);
+    }
+        });
+    });
+</script>

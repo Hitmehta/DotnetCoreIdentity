@@ -1,0 +1,27 @@
+﻿@model List<DotnetCoreIdentity.Models.RoleMenuPermission>
+
+<div style="max-height: 300px; overflow-y: auto;">
+    <table class="table table-bordered mt-3" id="permissionsTable">
+        <thead class="table-light sticky-top">
+            <tr>
+                <th>Menu</th>
+                <th>View</th>
+                <th>Insert</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-menu-link-id="@item.MenuLinkId">
+                    <td>@item.MenuLink.MenuLinkTitle</td>
+                    <td><input type="checkbox" class="canViewCheckbox" @(item.CanView ? "checked" : "") /></td>
+                    <td><input type="checkbox" class="canInsertCheckbox" @(item.CanInsert ? "checked" : "") /></td>
+                    <td><input type="checkbox" class="canUpdateCheckbox" @(item.CanUpdate ? "checked" : "") /></td>
+                    <td><input type="checkbox" class="canDeleteCheckbox" @(item.CanDelete ? "checked" : "") /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

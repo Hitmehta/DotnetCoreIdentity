@@ -1,0 +1,81 @@
+﻿@model RoleSelectionViewModel
+
+<h1>Role Privilege</h1>
+
+<div class="container">
+    @Html.DropDownList("roleDropdown", (SelectList)ViewBag.RoleList, new { @class = "form-control", id = "roleDropdown" })
+
+    <div id="permissionsContainer"></div>
+    <button class="btn btn-success" id="btnSavePermissions">Save Permissions</button>
+</div>  
+
+<script>
+    $(document).ready(function () {
+        const adminRoleId = $('#roleDropdown option').filter(function () {
+            return $(this).text().trim().toLowerCase() === 'admin';
+        }).val();
+
+        if (adminRoleId) {
+            $('#roleDropdown').val(adminRoleId);
+            loadPermissions(adminRoleId); // ✅ Call function on page load with Admin
+        }
+
+        $('#roleDropdown').on('change', function () {
+            const roleId = $(this).val();
+            if (roleId) {
+                loadPermissions(roleId);
+            }
+        });
+    });
+
+    // 🔧 Add this click event for save
+    $('#btnSavePermissions').on('click', function () {
+        const roleId = $('#roleDropdown').val();
+        if (roleId) {
+            savePermissions(roleId);
+        } else {
+            alert("Please select a role first.");
+        }
+    });
+
+    function loadPermissions(roleId) {
+        $.ajax({
+            url: '/RolePrivillige/GetPermissionsByRole',
+            data: { roleId: roleId },
+            success: function (result) {
+                $('#permissionsContainer').html(result);
+            },
+            error: function () {
+                alert("Failed to load permissions.");
+            }
+        });
+    }
+
+    function savePermissions(roleId) {
+        const permissions = [];
+
+        $('#permissionsTable tbody tr').each(function () {
+            permissions.push({
+                RoleId: roleId,
+                MenuLinkId: $(this).data('menu-link-id'),
+                CanView: $(this).find('.canViewCheckbox').is(':checked'),
+                CanInsert: $(this).find('.canInsertCheckbox').is(':checked'),
+                CanUpdate: $(this).find('.canUpdateCheckbox').is(':checked'),
+                CanDelete: $(this).find('.canDeleteCheckbox').is(':checked')
+            });
+        });
+
+        $.ajax({
+            url: '/RolePrivillige/UpdatePermissionsForRole',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(permissions),
+            success: function (response) {
+                alert(response);
+            },
+            error: function () {
+                alert('Failed to update permissions.');
+            }
+        });
+    }
+</script>
